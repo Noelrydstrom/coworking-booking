@@ -1,10 +1,1 @@
 Skriv det som ska va här beskrivning osv!!!
-
-Måste fixa MongoDB för att ha up and running :)
-
-
-
-Tokens:
-noel= "token": "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Y2JjMTBiOWFmMWI4NzQwNTk3ZjZjNyIsInJvbGUiOiJVc2VyIiwiaWF0IjoxNzc1MDM1MTUzfQ.Bbvw_3Z-sGpOIf1nsj1znGRmV9UgaaCksh0zBCGyX7E"
-
-admin= "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5Y2NkZmM0MTNlZTQ5YzcyNWI1YWM3NyIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc3NTAzNDM0Nn0.QsNBoz2KiZ6u7eYerBAwkuYuiyd6LvMRKq_eTq2Urwk"
