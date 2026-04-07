@@ -1,4 +1,4 @@
-let client = null;
+/*let client = null;
 
 try {
   const { createClient } = require("redis");
@@ -18,4 +18,4 @@ try {
   console.log("Redis not installed, skipping...");
 }
 
-module.exports = client;
+module.exports = client;*/
