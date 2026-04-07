@@ -5,20 +5,23 @@ const mongoose = require("mongoose");
 
 const server = http.createServer(app);
 
-// 🔥 skapa socket.io DIREKT
+// Socket.IO
 const io = require("socket.io")(server, {
   cors: { origin: "*" },
 });
 
 app.set("io", io);
 
-// 🔥 connect DB sen starta server
+// 🔥 STARTA SERVER DIREKT
+server.listen(process.env.PORT || 3000, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
+});
+
+// 🔥 CONNECT DB SEPARAT
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-
-    server.listen(process.env.PORT, () => {
-      console.log(`Server running on port ${process.env.PORT}`);
-    });
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    console.log("MongoDB connection error:", err);
+  });
