@@ -1,5 +1,5 @@
-const client = require("../config/redis");
 const Room = require("../models/Room");
+const client = require("../config/redis"); // only used locally
 
 exports.createRoom = async (req, res) => {
   try {
@@ -15,12 +15,12 @@ exports.createRoom = async (req, res) => {
 
     const room = await Room.create(req.body);
 
-    // Invalidate Redis cache
+    // Invalidate Redis cache only if client exists
     if (client && client.isOpen) {
       try {
         await client.del("rooms");
       } catch (err) {
-        console.log("Redis DEL error:", err); // log but don’t fail
+        console.log("Redis DEL error:", err);
       }
     }
 
@@ -33,53 +33,45 @@ exports.createRoom = async (req, res) => {
 
 exports.getRooms = async (req, res) => {
   try {
-    console.log("req.user:", req.user); // optional: check which user is calling
-
     let rooms;
 
-    // Try to get rooms from Redis first
+    // Try Redis only if client exists
     if (client && client.isOpen) {
       try {
         const cached = await client.get("rooms");
         if (cached) {
-          console.log("From Redis");
-          rooms = JSON.parse(cached);
-          return res.json(rooms);
+          console.log("From Redis (local only)");
+          return res.json(JSON.parse(cached));
         }
       } catch (err) {
-        console.log("Redis GET error:", err); // log Redis errors but don’t fail
+        console.log("Redis GET error:", err);
       }
     }
 
-    // Fetch rooms from MongoDB
+    // Fetch from MongoDB
     rooms = await Room.find();
     console.log("From DB:", rooms);
 
-    // Cache rooms in Redis (non-blocking)
+    // Cache in Redis if client exists
     if (client && client.isOpen) {
       try {
-        await client.set("rooms", JSON.stringify(rooms), { EX: 60 }); // cache for 60 sec
+        await client.set("rooms", JSON.stringify(rooms), { EX: 60 });
       } catch (err) {
-        console.log("Redis SET error:", err); // log but don’t fail
+        console.log("Redis SET error:", err);
       }
     }
 
     res.json(rooms);
   } catch (err) {
     console.log("Error in getRooms:", err);
-    res.status(500).json({ message: err.message }); // show actual error message
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.updateRoom = async (req, res) => {
   try {
-    const room = await Room.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    const room = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-    // Invalidate Redis cache
     if (client && client.isOpen) {
       try {
         await client.del("rooms");
@@ -99,7 +91,6 @@ exports.deleteRoom = async (req, res) => {
   try {
     await Room.findByIdAndDelete(req.params.id);
 
-    // Invalidate Redis cache
     if (client && client.isOpen) {
       try {
         await client.del("rooms");
