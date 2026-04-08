@@ -1,1 +1,65 @@
-Skriv det som ska va här beskrivning osv!!!
+En REST API för hantering av coworking-platser, konferensrum och bokningar med användarautentisering.
+
+---
+
+## Kort beskrivning
+
+Detta projekt låter användare registrera sig, logga in, se och boka rum. Administratörer kan skapa, uppdatera och ta bort rum samt hantera användare. Bokningar kan skapas, ändras och tas bort med rätt behörighet. Redis används för caching av rum och MongoDB Atlas för datalagring.
+
+---
+
+## Kör projektet lokalt
+
+1. Klona projektet:
+
+```bash
+git clone <repo-url>
+cd coworking-booking
+
+Installera beroenden:
+
+```bash
+npm install
+
+Skapa en .env fil med följande variabler:
+PORT=5000
+MONGO_URI=<din_mongodb_uri>
+JWT_SECRET=<din_jwt_secret>
+REDIS_URL=<din_redis_url>   # valfritt om du använder Redis
+
+Starta servern i utvecklingsläge:
+
+```bash
+npm run dev
+
+Servern körs nu på http://localhost:5000.
+
+API-dokumentation
+
+Obs: Skicka alltid JWT-token i headern Authorization: Bearer <token> för skyddade rutter.
+
+Users
+Method	Endpoint	Body (JSON)	Svar (JSON)
+POST	/api/auth/register	{ "username": "user", "password": "pass" }	Ny användare
+POST	/api/auth/login	{ "username": "user", "password": "pass" }	{ "token": "<JWT>" }
+GET	/api/users	Header: Authorization Bearer <JWT> (Admin)	Lista med användare
+DELETE	/api/users/:id	Header: Authorization Bearer <JWT> (Admin)	{ "message": "User deleted" }
+
+Rooms
+Method	Endpoint	Body (JSON)	Svar (JSON)
+GET	/api/rooms	Header: Authorization Bearer <JWT>	Lista med rum
+POST	/api/rooms	{ "name": "Rum A", "capacity": 10, "type": "workspace" } (Admin)	Skapat rum
+PUT	/api/rooms/:id	{ "name": "Rum B" } (Admin)	Uppdaterat rum
+DELETE	/api/rooms/:id	(Admin)	{ "message": "Room deleted" }
+
+Bookings
+Method	Endpoint	Body (JSON)	Svar (JSON)
+GET	/api/bookings	Header: Authorization Bearer <JWT>	Lista med användarens bokningar
+POST	/api/bookings	{ "roomId": "<roomId>", "startTime": "<ISO>", "endTime": "<ISO>" }	Skapad bokning
+PUT	/api/bookings/:id	{ "startTime": "<ISO>" } (ägare/Admin)	Uppdaterad bokning
+DELETE	/api/bookings/:id	(ägare/Admin)	{ "message": "Deleted" }
+
+Tips
+Använd MongoDB Compass för att se databasen lokalt.
+Se till att Redis-servern körs om du vill använda caching.
+Socket.io används för realtidsuppdateringar (valfritt).
